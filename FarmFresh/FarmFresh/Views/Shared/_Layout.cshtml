@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @*@Scripts.Render("~/bundles/modernizr")*@
+</head>
+<body class="p-0">
+    <nav class="navbar fixed-top navbar-light bg-white p-0 mb-1">
+        <a class="navbar-brand col-2" href="@Url.Action("Index","Home")">
+            <img class="img-fluid" width="300px" height="50px" alt="" loading="lazy" src="~/Resources/FarmFresh Logo.png" />
+        </a>
+        <div class="form-inline float-right col-8">
+            <input class="form-control mr-sm-2 col-6" type="text" id="searchmaininput" placeholder="Search for a product or brand" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" onclick="SearchMain()">Search</button>
+        </div>
+        <a class="navbar-brand col-1" href="@Url.Action("ProductList","Product")">
+            <img class="float-right" width="50px" height="50px" alt="" loading="lazy" src="~/Resources/shopping-cart.png" />
+        </a>
+        <hr class="bg-dark col-12 m-0" />
+    </nav>
+
+    <div class="container-fluid body-content p-0" id="MainBody">
+        @RenderBody()
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        function SearchMain() {
+            var data = $("#searchmaininput").val();
+               $.ajax({
+            cache: false,
+            url: '@Url.Action("SearchMain", "Product")',
+            contentType: 'application/json; charset=utf-8',
+            data: { getpassdata: data},
+            beforesend: function () {
+                $("#MainBody").empty().append('<div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>');
+                },
+            success: function (myData) {
+                $("#MainBody").empty().append(myData);
+                //Pagination(CurrentPage, searchData.TotalPage);
+                },
+            complete: function () {
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

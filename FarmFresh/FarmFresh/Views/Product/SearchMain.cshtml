@@ -1,0 +1,58 @@
+﻿@model  IEnumerable<DataAccess.Model.Product>
+@{
+    <div class="mt-5 col-12" style="height:50px"></div>
+    
+    <div class="col-12 row mt-4 text-center">
+        @foreach (var data in @Model)
+        {
+            <div class="col-3 ">
+                <a href="#" onclick="ProductDetail('@data.GUID')"><img height="200" width="200" style="border-radius:15px" class=" mx-auto d-block" src="~/ProductUploadPhotos/@data.ProductPhoto" /></a>
+
+                <p class="card-text font-weight-bold ml-3 mb-1">@data.ProductName</p>
+                <p class="text-muted font-weight-bold ml-3">@data.PackingType</p>
+            </div>
+
+        }
+    </div>
+
+    <div class="col-12" id="pagination"></div>
+}
+<div id="ProductDetail" class="modal  fade" tabindex="-1" role="dialog" aria-labelledby="myModal-label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Product Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="ProductDetailModal">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#ProductDetail').on('hidden.bs.modal', function () {
+        $(this).data('modal', null);
+        $("#ProductDetailModal").empty();
+    });
+
+    function ProductDetail(GUID) {
+
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("ProductDetail", "Product")',
+
+                data: { GUID: GUID},
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#ProductDetailModal").empty().append(Data);
+                },
+                complete: function () {
+                    $("#ProductDetail").modal('show');
+                }
+            });
+    }
+</script>
+

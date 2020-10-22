@@ -1,0 +1,319 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewBag.Title = "Admin Page";
+}
+
+@model DataAccess.SearchModel.SM_Product
+<!-- Core JS files -->
+
+
+
+<div class="col-lg-12">
+    <div class="row">
+        <div class=" col-sm-6"><h4 class="panel-title font-weight-bold">Product Control</h4></div>
+        <div class=" col-sm-6 text-right"><button class="btn btn-primary  " onclick="Add()"><b><i class="icon icon-add"></i></b>Add New</button></div>
+    </div>
+    <fieldset>
+
+        <div class="  mt-10 row ">
+            <div class="form-group col-lg-3">
+                <label class="font-weight-bold">Product Type</label>
+                <select id="SearchProductType" name="SearchProductType" class=" form-control">
+                    @if (ViewBag.ProductTypeList != null)
+                    {
+                        foreach (var data in ViewBag.ProductTypeList)
+                        {
+                            if (Model.ProductType == data.Value)
+                            {
+                                <option selected value="@data.Value">@data.ProductTypeName</option>
+                            }
+                            else
+                            {
+                                <option value="@data.Value">@data.ProductTypeName</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class=" col-lg-6 text-left"><button class="btn btn-outline-info mt-4" type="submit" onclick="Search()"> Search </button></div>
+        </div>
+
+    </fieldset>
+    <hr />
+    <div class="card mt-10 " style="border-radius:10px">
+        <div class="table-responsive" style="border-radius:10px">
+            <table class="table table-sm">
+                <thead class="bg-slate-800">
+                    <tr>
+
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>Photo</th>
+                        <th>Product Type</th>
+                        <th>Packing Type </th>
+                        <th>On Sale </th>
+                        <th>Shop By Store </th>
+                        @*<th width="5%">UMO</th>
+                            <th width="9%">UMO(Description)</th>*@
+                        @*<th>Created By/Date</th>*@
+                        <th>Created Date</th>
+                        <th class="text-center border-right-info">Actions</th>
+                    </tr>
+                </thead>
+                <!-- Table Body -->
+                <tbody id="tablebody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Pagination -->
+    <div id="pagination"></div>
+    
+    <div id="DataEditFormModalBody" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModal-label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div id="EditFormModalBody">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery-ui.js"></script>
+<script src="~/Scripts/sweet_alert.minNew.js"></script>
+<script>
+
+        var CurrentPage = @Html.Raw(Json.Encode(Model.CurrentPage));
+        var TotalCount = @Html.Raw(Json.Encode(Model.TotalPage));
+        var searchData = {
+            'ProductID': @Html.Raw(Json.Encode(Model.ProductID)),
+            'ProductName': @Html.Raw(Json.Encode(Model.ProductName)),
+            'ProductType': @Html.Raw(Json.Encode(Model.ProductType)),
+            'TotalCount': @Html.Raw(Json.Encode(Model.TotalCount)),
+            'TotalPage': @Html.Raw(Json.Encode(Model.TotalPage)),
+            'CurrentPage': @Html.Raw(Json.Encode(Model.CurrentPage)),
+    }
+
+    $('#DataEditFormModal').on('hidden.bs.modal', function () {
+        $(this).data('modal', null);
+        $("#EditFormModalBody").empty();
+    });
+
+
+    $(document).ready(function () {
+        showlist("#tablebody", searchData);
+    });
+
+    $("#upload_link").on('click', function (e) {
+        e.preventDefault();
+        $("#upload:hidden").trigger('click');
+    });
+
+    function onFileSelected(event) {
+        var selectedFile = event.target.files[0];
+
+        var reader = new FileReader();
+
+        var imgtag = document.getElementById("productphotoid");
+        imgtag.title = selectedFile.name;
+
+        reader.onload = function (event) {
+            imgtag.src = event.target.result;
+        };
+        var data = new FormData();
+        data.append(selectedFile.name, selectedFile);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("UploadProductPhoto", "Admin")',
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                $('#ProductPhoto').val(result);
+            },
+            error: function (xhr, status, p3, p4) {
+                var err = "Error " + " " + status + " " + p3 + " " + p4;
+                if (xhr.responseText && xhr.responseText[0] == "{")
+                    err = JSON.parse(xhr.responseText).Message;
+                console.log(err);
+            }
+        });
+        reader.readAsDataURL(selectedFile);
+    }
+
+    function Edit(GUID) {
+
+        BindEditForm(GUID, "Edit");
+    }
+    function Add() {
+
+        BindEditForm("","Add");
+    }
+    function Search() {
+        searchData.ProductType = $("#SearchProductType").val();
+        GetTotalPage();
+        showlist("#tablebody", searchData);
+    }
+    function showlist(div, passdata) {
+        var data = JSON.stringify(passdata);
+            $.ajax({
+            cache: false,
+            url: '@Url.Action("ProductListAdminPartial", "Admin")',
+            contentType: 'application/json; charset=utf-8',
+            data: { getpassdata: data},
+            beforesend: function () {
+                $(div).empty().append('<div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>');
+                },
+            success: function (myData) {
+                $(div).empty().append(myData);
+                Pagination(CurrentPage, searchData.TotalPage);
+                },
+            complete: function () {
+                }
+            });
+    }
+    function Pagination(Page, Count) {
+            $.ajax({
+            cache: false,
+            url: '@Url.Action("Pagination", "Common")',
+            data: { Page: Page, Count: Count},
+            //beforeSend: function () {
+            //    $(div).empty().append('<div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>');
+            //},
+            success: function (myData) {
+                $("#pagination").empty().append(myData);
+            },
+            complete: function () {
+            }
+        });
+    }
+    function GetTotalPage() {
+        var data = JSON.stringify(searchData);
+            $.ajax({
+            cache: false,
+            url: '@Url.Action("GetTotalPage", "Admin")',
+            data: { getpassdata: data},
+            success: function (myData) {
+                              searchData.TotalPage = myData;
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    function Delete(GUID) {
+           swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this data!",
+               type: "warning",
+               icon: "warning",
+               buttons: true,
+               dangerMode: true,})
+                .then((willDelete) => {
+                    if (willDelete) {
+                       $.ajax({
+                        cache: false,
+                        url: '@Url.Action("DeleteProduct", "Admin")',
+                        contentType: 'application/json; charset=utf-8',
+                        data: { GUID: GUID},
+
+                        success: function (myData) {
+                            if (myData == "Success") {
+
+                                swal("Poof! Your data has been deleted!", {
+                                icon: "success",});
+                                Pagination(CurrentPage, TotalCount);
+                                showlist("#tablebody", searchData);
+                            }
+                            else {
+                                swal("", "Oops! Process Fail !!", "fail");
+                            }
+                         }
+
+                     });
+
+                    } else {
+                        swal("Your data is safe!");
+                            }
+                });
+    }
+    function pageFunction(current) {
+        searchData.CurrentPage = current;
+        CurrentPage = current;
+        Pagination(current, TotalCount);
+        showlist("#tablebody", searchData);
+    }
+    function BindEditForm(GUID,Type) {
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("EditProductForm", "Admin")',
+                data: { GUID: GUID},
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#EditFormModalBody").empty().append(Data);
+                },
+                complete: function () {
+                    $("#DataEditFormModalBody").modal('show');
+                    $('#EditProduct').submit(function (e) {
+                        e.preventDefault();
+                        $.ajax({
+                            cache: false,
+                            url: $(this).attr('action'),
+                            data: $(this).serialize(),
+                            type: "POST",
+                            beforeSend: function () {
+                                $('#savebtn').empty().append('<span class="spinner icon-spinner4"></span> Saving...');
+                                $('#savebtn').prop("disabled", true);
+                            },
+                            success: function (myData) {
+                                if (myData == "Success") {
+                                    if (Type == "Add") {
+                                        swal("", "Successfully Saved!", "success");
+                                    }
+                                    else {
+                                        swal("", "Successfully Edited !", "success");
+                                    }
+
+                                }
+                                else {
+                                    swal("", "Oops! Process Fail !!", "fail");
+                                }
+                                $("#DataEditFormModalBody").modal('hide');
+                                showlist("#tablebody", searchData);
+                            },
+                            complete: function () {
+                            }
+                        });
+                    });
+                }
+            });
+    }
+
+     $('#ProductDetail').on('hidden.bs.modal', function () {
+        $(this).data('modal', null);
+        $("#ProductDetailModal").empty();
+    });
+
+
+    function ProductDetail(GUID) {
+
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("ProductDetail", "Product")',
+
+                data: { GUID: GUID},
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#ProductDetailModal").empty().append(Data);
+                },
+                complete: function () {
+                    $("#ProductDetail").modal('show');
+                }
+            });
+    }
+
+</script>

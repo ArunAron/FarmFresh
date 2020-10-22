@@ -1,0 +1,54 @@
+﻿@model DataAccess.Model.Product
+
+<div class="row">
+    <div class="col-6 row mt-2">
+        <img height="200" width="200" style="border-radius:15px" class=" mx-auto d-block" src="~/ProductUploadPhotos/@Model.ProductPhoto" />
+    </div>
+    <div class="col-6 mt-2">
+        <div class=" row mt-2 ">
+            <label class="font-weight-bold col-8">Product Name :</label> <span class="col-4"> @Model.ProductName</span>
+        </div>
+        <div class="row mt-2">
+            <label class="font-weight-bold col-8">Product Type :</label> <span class="col-4">
+                @{
+                    var Type = DataAccess.CommonClass.ProductTypeListStatic().Where(a => a.Value == Model.ProductType).FirstOrDefault().ProductTypeName;
+                }
+                @Type
+            </span>
+        </div>
+        <div class="row mt-2">
+            <label class="font-weight-bold col-8">Packing Type :</label> <span class="col-4"> @Model.PackingType</span>
+        </div>
+        <div class="row mt-2">
+            <label class="font-weight-bold col-8">On Sale ! :</label> <span class="col-4">
+                @{
+                    if (Model.OnSale)
+                    {
+                        <span>Yes</span>
+                    }
+                    else
+                    {
+                        <span>No</span>
+                    }
+                }
+            </span>
+        </div>
+        <div class="row mt-2">
+            <label class="font-weight-bold col-8">Shop by Store :</label> <span class="col-4">
+                @{
+                    if (Model.ShopByStore)
+                    {
+                        <span>Yes</span>
+                    }
+                    else
+                    {
+                        <span>No</span>
+                    }
+                }
+            </span>
+        </div>
+    </div>
+
+
+</div>
+

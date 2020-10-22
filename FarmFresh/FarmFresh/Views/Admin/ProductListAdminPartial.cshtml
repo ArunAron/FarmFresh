@@ -1,0 +1,38 @@
+﻿@model  IEnumerable<DataAccess.Model.Product>
+
+@{
+    var count = 1;
+    var CP = Convert.ToInt32(ViewBag.CurrentPagePartial);
+    CP = CP - 1;
+    count = (CP * DataAccess.CommonClass.PageSize) + 1;
+
+    foreach (var data in @Model)
+    {
+        <tr>
+            <td>@count</td>
+            <td>@data.ProductName </td>
+            <td>
+                <img src="~/ProductUploadPhotos/@data.ProductPhoto" height="100" width="100" />
+            </td>
+            <td>
+                @{ 
+                    var Type = DataAccess.CommonClass.ProductTypeListStatic().Where(a => a.Value == data.ProductType).FirstOrDefault().ProductTypeName;
+                }
+                @Type
+            </td>
+            <td>@data.PackingType</td>
+            <td>@data.OnSale</td>
+            <td>@data.ShopByStore</td>
+            <td>@data.CreatedDate</td>
+            <td class="text-center">
+                <div class="list-icons">
+                    <button data-popup="tooltip" title="Update" class="btn btn-sm btn-info " onclick="Edit('@data.GUID')">Update </button>
+                    @*<button data-popup="tooltip" title="UOM" class="btn btn-sm btn-icon rounded-round bg-teal-800 " onclick="BindUMO('@data.GUID')"><b><i class="icon-tree7 "></i></b> </button>*@
+                    <button data-popup="tooltip" title="Delete" class="btn  btn-sm btn-danger " onclick="Delete('@data.GUID')">Delete </button>
+                </div>
+            </td>
+        </tr>
+        count++;
+    }
+}
+

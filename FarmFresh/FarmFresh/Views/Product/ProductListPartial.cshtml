@@ -1,0 +1,23 @@
+﻿@model  IEnumerable<DataAccess.Model.Product>
+@{
+
+
+    foreach (var data in @Model)
+    {
+        <div class="col-3 ">
+            <a href="#" onclick="ProductDetail('@data.GUID')"><img height="200" width="200" style="border-radius:15px" class=" mx-auto d-block" src="~/ProductUploadPhotos/@data.ProductPhoto" /></a>
+            
+            <p class="card-text font-weight-bold ml-3 mb-1">@data.ProductName</p>
+            <p class="text-muted font-weight-bold ml-3">@data.PackingType</p>
+        </div>
+
+    }
+    <div class="col-12" id="pagination"></div>
+}
+
+<script>
+    searchData.CurrentPage = @Html.Raw(Json.Encode(ViewBag.CurrentPagePartial));
+    searchData.TotalPage = @Html.Raw(Json.Encode(ViewBag.TotalPagePartial));
+    Pagination(searchData.CurrentPage, searchData.TotalPage);
+</script>
+

@@ -1,0 +1,150 @@
+﻿<style>
+
+    .parallaxThird {
+        background-color: #f4f4f4;
+        /* The image used */
+        /* Set a specific height */
+        min-height: 600px;
+        width: 100%;
+        /* Create the parallax scrolling effect */
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .listyle {
+        padding: 1rem 1.25rem 1rem 4.25rem;
+        font-size: 20px;
+        color: #7a7a7b;
+    }
+    .lstactive {
+        padding: 1rem 1.25rem 1rem 4.25rem;
+        font-size: 20px;
+        font-weight:bold;
+        color: #000000;
+    }
+</style>
+<div class="parallaxThird mt-5">
+    <div class="col-12 row">
+        <div class="col-3 " style="background-color:#ecf0f1">
+            <div class="list-group" style="border:unset">
+                <a href="#" id="onsale" onclick="Change('onsale');return false;" class="listyle"> On Sales!</a>
+                <a href="#" id="new" onclick="Change('new');return false;" class="listyle">New (within a Week) </a>
+                <a href="#" id="shopbystore" onclick="Change('shopbystore');return false;" class="listyle">Shop By Store</a>
+                <a href="#" id="fruitandveg" onclick="Change('fruitandveg');return false;" class="listyle">Fruit & veg</a>
+                <a href="#" id="meatandseafood" onclick="Change('meatandseafood');return false;" class="listyle">Meat & Seafood</a>
+                <a href="#" id="dairyandchilled" onclick="Change('dairyandchilled');return false;" class="listyle">Dairy and Chilled</a>
+                <a href="#" id="bakery" onclick="Change('bakery');return false;" class="listyle">Bakery</a>
+                <a href="#" id="beverages" onclick="Change('beverages');return false;" class="listyle">Beverages</a>
+            </div>
+        </div>
+        <div id="productlist" class="col-9 row mt-4 text-center">
+        </div>
+        
+    </div>
+</div>
+<div id="ProductDetail" class="modal  fade" tabindex="-1" role="dialog" aria-labelledby="myModal-label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Product Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="ProductDetailModal">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+
+    var searchData = {
+            'SerachType': "",
+            'TotalPage': 1,
+            'CurrentPage': 1,
+    }
+    $(document).ready(function () {
+        Change("onsale");
+    });
+    function removeactive() {
+        $("#onsale").removeClass("lstactive");
+        $("#new").removeClass("lstactive");
+        $("#shopbystore").removeClass("lstactive");
+        $("#fruitandveg").removeClass("lstactive");
+        $("#meatandseafood").removeClass("lstactive");
+        $("#dairyandchilled").removeClass("lstactive");
+        $("#bakery").removeClass("lstactive");
+        $("#beverages").removeClass("lstactive");
+    }
+    function Change(value) {
+        removeactive();
+        $("#" + value).addClass("lstactive");
+        searchData.SerachType = value;
+        showlist("#productlist", searchData);
+    }
+
+    function showlist(div, passdata) {
+        var data = JSON.stringify(passdata);
+            $.ajax({
+            cache: false,
+            url: '@Url.Action("ProductListPartial", "Product")',
+            contentType: 'application/json; charset=utf-8',
+            data: { getpassdata: data},
+            beforesend: function () {
+                $(div).empty().append('<div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>');
+                },
+            success: function (myData) {
+                $(div).empty().append(myData);
+
+                },
+            complete: function () {
+                }
+            });
+    }
+    function Pagination(Page, Count) {
+            $.ajax({
+            cache: false,
+            url: '@Url.Action("Pagination", "Common")',
+            data: { Page: Page, Count: Count},
+            //beforeSend: function () {
+            //    $(div).empty().append('<div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>');
+            //},
+            success: function (myData) {
+                $("#pagination").empty().append(myData);
+            },
+            complete: function () {
+            }
+        });
+    }
+    function pageFunction(current) {
+        searchData.CurrentPage = current;
+        showlist("#productlist", searchData);
+    }
+
+    $('#ProductDetail').on('hidden.bs.modal', function () {
+        $(this).data('modal', null);
+        $("#ProductDetailModal").empty();
+    });
+
+
+    function ProductDetail(GUID) {
+
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("ProductDetail", "Product")',
+
+                data: { GUID: GUID},
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#ProductDetailModal").empty().append(Data);
+                },
+                complete: function () {
+                    $("#ProductDetail").modal('show');
+                }
+            });
+    }
+</script>

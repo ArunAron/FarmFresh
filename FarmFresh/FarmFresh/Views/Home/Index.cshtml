@@ -1,0 +1,69 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    .parallax {
+        background-image: url('../../Resources/BannerPhoto.jpg');
+        /* The image used */
+        /* Set a specific height */
+        min-height: 600px;
+        /* Create the parallax scrolling effect */
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .parallaxSecond {
+        background-color: white;
+        /* The image used */
+        /* Set a specific height */
+        min-height: 600px;
+        width: 100%;
+        /* Create the parallax scrolling effect */
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+</style>
+<div class="parallax"></div>
+
+<div class="parallaxSecond p-5 ">
+    <div class="col-12 row">
+        <div class="col-6 mt-2">
+            <h1 style="font-size:70px">FRESH FOOD FOR A FRESHER YOU</h1>
+            <h1 class="mt-5">Quality Food, Quality Life</h1>
+        </div>
+        <div class="col-6 mt-2">
+            <img class="mr-5" width="600px" height="300px" src="~/Resources/Side image.png" />
+        </div>
+        <div class="col-12 row mt-5">
+            <div class="col-4 mt-2 text-center">
+                <img width="200px" height="200px" src="~/Resources/clock.png" />
+            </div>
+            <div class="col-4 mt-2 text-center">
+                <img width="200px" height="200px" src="~/Resources/delivery-truck.png" />
+            </div>
+            <div class="col-4 mt-2 text-center">
+                <img width="200px" height="200px" src="~/Resources/support.png" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+@*<script>
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 800) {
+                    $('.bodyimage img').attr('src', '../../Resources/BannerPhoto.png').fadeIn(250);
+                }
+                if ($(this).scrollTop() < 800) {
+                    $('.bodyimage img').attr('src', '../../Resources/shopping-cart.png').fadeIn(250);
+                }
+            })
+        });
+    </script>*@

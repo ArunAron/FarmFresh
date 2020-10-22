@@ -1,0 +1,116 @@
+﻿@model DataAccess.Model.Product
+@using (Html.BeginForm("EditProduct", "Admin", FormMethod.Post, new { id = "EditProduct" }))
+{
+    <div class="modal-header bg-slate-800" style="border-radius:0">
+
+        @if (string.IsNullOrEmpty(Model.GUID))
+        {
+
+            <h5 class="modal-title font-weight-bold">Add Product Form</h5>
+        }
+        else
+        {
+            <h5 class="modal-title font-weight-bold">Update Product Form</h5>
+        }
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-12 mt-2">
+                    <label class="font-weight-bold">Product Name</label>
+                    @Html.TextBoxFor(a => a.ProductName, new { type = "text", @class = "form-control round", placeholder = "", required = "required", autocomplete = "off" })
+                    @Html.HiddenFor(a => a.ID)
+                    @Html.HiddenFor(a => a.GUID)
+                </div>
+                <div class="col-sm-6 mt-2">
+                    <label class="font-weight-bold">Product Type</label>
+                    <select id="ProductType" name="ProductType" class=" form-control">
+                        @if (ViewBag.ProductTypeList != null)
+                        {
+                            foreach (var data in ViewBag.ProductTypeList)
+                            {
+                                if (Model.ProductType == data.Value)
+                                {
+                                    <option selected value="@data.Value">@data.ProductTypeName</option>
+                                }
+                                else
+                                {
+                                    <option value="@data.Value">@data.ProductTypeName</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-6 mt-2">
+                    <label class="font-weight-bold">Packing Type</label>
+                    <select id="PackingType" name="PackingType" class=" form-control">
+                        @if (ViewBag.PackingType != null)
+                        {
+                            foreach (var data in ViewBag.PackingType)
+                            {
+                                if (Model.PackingType == data)
+                                {
+                                    <option selected value="@data">@data</option>
+                                }
+                                else
+                                {
+                                    <option value="@data">@data</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-sm-6 mt-2 row">
+                    <label class="font-weight-bold col-sm-6 mt-3 ">On Sale !</label>
+                    @Html.CheckBoxFor(a => a.OnSale, new { @class = "form-check col-sm-6 mt-4", placeholder = "", autocomplete = "off" })
+                </div>
+                <div class="col-sm-6 mt-2 row">
+                    <label class="font-weight-bold col-sm-7 mt-3 pr-0">Shop By Store</label>
+                    @Html.CheckBoxFor(a => a.ShopByStore, new { @class = "form-check col-sm-5 mt-4", placeholder = "", autocomplete = "off" })
+                </div>
+                @if (Model.ProductPhoto != null)
+                {
+                    <div class=" col-sm-6 mt-4">
+                        @Html.HiddenFor(a => a.ProductPhoto, new { type = "hidden", @class = "form-control hide", placeholder = "", autocomplete = "off", style = "resize:none", id = "ProductPhoto" })
+
+                        <img id="productphotoid" class="img-thumbnail" width="100" height="300" src="~/ProductUploadPhotos/@Model.ProductPhoto" alt="">
+                        <input id="upload" class="form-control-file" type="file" onchange="onFileSelected(event)" accept="image/*">
+                        <a href="#" id="upload_link" class="btn btn-primary btn-sm">
+                            Upload
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <div class=" col-sm-6 mt-4">
+                        @Html.HiddenFor(a => a.ProductPhoto, new { type = "hidden", @class = "form-control hide", placeholder = "", autocomplete = "off", style = "resize:none", id = "ProductPhoto" })
+
+                        <img id="productphotoid" class="img-thumbnail" width="100" height="300" src="~/Resources/placeholder.jpg" alt="">
+                        <input id="upload" class="form-control-file" type="file" onchange="onFileSelected(event)" accept="image/*">
+                        <a href="#" id="upload_link" class="btn btn-primary btn-sm">
+                            Upload
+                        </a>
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+        @if (string.IsNullOrEmpty(Model.GUID))
+        {
+            <button type="submit" onclick="" class="btn btn-primary btn-ladda btn-ladda-spinner" data-spinner-color="#333" data-style="zoom-in"><span class="ladda-label">Save</span></button>
+        }
+        else
+        {
+            <button type="submit" onclick="" class="btn btn-primary btn-ladda btn-ladda-spinner" data-spinner-color="#333" data-style="zoom-in"><span class="ladda-label">Edit</span></button>
+        }
+    </div>
+}
